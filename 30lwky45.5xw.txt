@@ -1,0 +1,30 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: Prateek Kacker <Prateek Kacker>
+#
+# On branch master
+#
+# Initial commit
+#
+# Changes to be committed:
+#	new file:   PySudoku.py
+#	new file:   README.md
+#	new file:   __pycache__/PySudoku.cpython-35.pyc
+#	new file:   __pycache__/solution.cpython-35.pyc
+#	new file:   __pycache__/visualize.cpython-35.pyc
+#	new file:   images/sudoku-board-bare.jpg
+#	new file:   objects/GameResources.py
+#	new file:   objects/GameResources.pyc
+#	new file:   objects/SudokuGrid.pyc
+#	new file:   objects/SudokuSquare.py
+#	new file:   objects/SudokuSquare.pyc
+#	new file:   objects/__init__.py
+#	new file:   objects/__pycache__/GameResources.cpython-35.pyc
+#	new file:   objects/__pycache__/SudokuSquare.cpython-35.pyc
+#	new file:   solution.py
+#	new file:   solution_test.py
+#	new file:   visualize.py
+#
+

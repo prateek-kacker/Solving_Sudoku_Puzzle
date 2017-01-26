@@ -10,7 +10,9 @@ boxes = cross(rows, cols)
 row_units = [cross(r,cols) for r in rows]
 column_units = [cross(rows,c) for c in cols]
 square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + square_units + column_units
+diagnol_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['I1','H2','G3','F4','E5','D4','C3','B2','A1']] ### Adding diagnol units in the list
+### Addding diagnol units will help because this is the list which decides what units get processed together for numbers 1-9.
+unitlist = row_units + square_units + column_units + diagnol_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
@@ -34,24 +36,23 @@ def naked_twins(values):
     """
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
-    for i in values.keys():
-        for unit in units[i]:
-            dict_naked_twins=dict()
-            for box in unit:
-                if len(values[box])==2:
+    for i in values.keys():   ### For each box 
+        for unit in units[i]: ### Find the units
+            dict_naked_twins=dict() ### create a naked twins dictionary
+            for box in unit:  ### each box within the unit
+                if len(values[box])==2:  #### create a naked twin dictionary
                     dict_naked_twins[box] = values[box]
-            for twin1_keys in dict_naked_twins.keys():
-                for twin2_keys in dict_naked_twins.keys():
-                    if dict_naked_twins[twin1_keys]== dict_naked_twins[twin2_keys] and twin1_keys !=twin2_keys:
-                        print(twin1_keys,twin2_keys,dict_naked_twins[twin1_keys])
-                        for box2 in unit:
-                            print("values dictionary",box2,values[box2])
+            for twin1_keys in dict_naked_twins.keys():   ##### For each value of dictionary
+                for twin2_keys in dict_naked_twins.keys(): ####### for each value of dictionary
+                    if dict_naked_twins[twin1_keys]== dict_naked_twins[twin2_keys] and twin1_keys !=twin2_keys: #### identify twins
+                        for box2 in unit:  ##### Now search the entire unit and find the box containing the values of the twins
                             if box2 != twin1_keys and box2!=twin2_keys and len(values[box2])!=1 and len(values[box2])!=0:
-                                print(values[box2],box2)
+    #                            print(dict_naked_twins)
+    #                            print(box2,values[box2])
                                 values[box2]=values[box2].replace(dict_naked_twins[twin1_keys][0],"")
-                                print(values[box2],box2)
+    #                           print(box2,values[box2])
                                 values[box2]=values[box2].replace(dict_naked_twins[twin1_keys][1],"")
-                                print(values[box2],box2)
+    #                            print(box2,values[box2])
     return values                                                    
                                         
 def grid_values(grid):
@@ -128,7 +129,7 @@ def reduce_puzzle(values):
     return values
 
 def solve(grid):
-     return search(grid)
+     return search(grid_values(grid))
 
 def search(values):
     values = reduce_puzzle(values)
@@ -149,8 +150,8 @@ def search(values):
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(grid_values(diag_sudoku_grid)))
-
+    display(solve(diag_sudoku_grid))
+    
     try:
         from visualize import visualize_assignments
         visualize_assignments(assignments)

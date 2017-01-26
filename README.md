@@ -3,11 +3,14 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: Naked Twins is kind of elimination technique and it has to be done repeatedly. It is at the same level as other techniniques like elimination and only_choice. 
+Doing repeatedly helps in reducing the sudoku puzzle to a level when none of the techniques work. Then we do a depth first search to solve the Sudoku problem
+
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: In Diagonal Sudoku problem, there is additional constraint of the diagonals having same property as a unit. 
+In the code, we create a list of units and we have two more units for diagonals.
 
 ### Install
 
