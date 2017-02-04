@@ -6,15 +6,15 @@ def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
 
-boxes = cross(rows, cols)
-row_units = [cross(r,cols) for r in rows]
-column_units = [cross(rows,c) for c in cols]
-square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+boxes = cross(rows, cols) ## This line is to create all possible boxes
+row_units = [cross(r,cols) for r in rows] # This creates a list of the boxes in a row
+column_units = [cross(rows,c) for c in cols] ## This creates a list of boxes in a column
+square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')] # this creates a list of the boxes in a 3x3 square
 diagnol_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['I1','H2','G3','F4','E5','D4','C3','B2','A1']] ### Adding diagnol units in the list
 ### Addding diagnol units will help because this is the list which decides what units get processed together for numbers 1-9.
-unitlist = row_units + square_units + column_units + diagnol_units
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
-peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+unitlist = row_units + square_units + column_units + diagnol_units ### Union of all the lists
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes) ### Units is a dictionary with key as box and value as the list of list of 9 boxes which follow the law of 1-9 numbers
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes) ### Peers contains a dictionary of boxes which are part of the same units
 
 def assign_value(values, box, value):
     """
@@ -36,23 +36,22 @@ def naked_twins(values):
     """
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
-    for i in values.keys():   ### For each box 
-        for unit in units[i]: ### Find the units
+    
+    for i in values.keys():   ### For each box in the soduku
+        for unit in units[i]: ### Find the unit of the box i
             dict_naked_twins=dict() ### create a naked twins dictionary
-            for box in unit:  ### each box within the unit
-                if len(values[box])==2:  #### create a naked twin dictionary
-                    dict_naked_twins[box] = values[box]
-            for twin1_keys in dict_naked_twins.keys():   ##### For each value of dictionary
-                for twin2_keys in dict_naked_twins.keys(): ####### for each value of dictionary
-                    if dict_naked_twins[twin1_keys]== dict_naked_twins[twin2_keys] and twin1_keys !=twin2_keys: #### identify twins
+            for box in unit:  ### for each box within the unit
+                if len(values[box])==2:  ## identify the boxes which have only two values
+                    dict_naked_twins[box] = values[box] ### Add it to the dictionary
+##### Finding naked twins in the naked_twin dictionary
+            for twin1_keys in dict_naked_twins.keys():   ##### For each value of naked twin dictionary
+                for twin2_keys in dict_naked_twins.keys(): ####### for each value of naked twin dictionary
+                    if dict_naked_twins[twin1_keys]== dict_naked_twins[twin2_keys] and twin1_keys !=twin2_keys: #### identify twins which have same value
                         for box2 in unit:  ##### Now search the entire unit and find the box containing the values of the twins
+##### Now the twins are found, remove all the values which have value of the naked twin
                             if box2 != twin1_keys and box2!=twin2_keys and len(values[box2])!=1 and len(values[box2])!=0:
-    #                            print(dict_naked_twins)
-    #                            print(box2,values[box2])
                                 values[box2]=values[box2].replace(dict_naked_twins[twin1_keys][0],"")
-    #                           print(box2,values[box2])
                                 values[box2]=values[box2].replace(dict_naked_twins[twin1_keys][1],"")
-    #                            print(box2,values[box2])
     return values                                                    
                                         
 def grid_values(grid):
@@ -92,6 +91,9 @@ def display(values):
         
 
 def eliminate(values):
+    """
+    This technique eliminates all the values having common numbers to the boxes which have a single number
+    """
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
     for box in solved_values:
         digit = values[box]
@@ -99,7 +101,9 @@ def eliminate(values):
             values[peer] = values[peer].replace(digit,'')
     return values
 
-def only_choice(values):
+def only_choice(values): 
+    """ This technique helps to find boxes in unit which have a unique number and then it removes all other numbers for that box
+    """
     for unit in unitlist:
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
@@ -108,6 +112,9 @@ def only_choice(values):
     return values
 
 def reduce_puzzle(values):
+    """ This function executes the constraint propogation algorithm by trying to optimize the sudoku by repeatedly executing
+    the elimination, naked_twins and only_choice till there is no optimization left
+    """
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
     stalled = False
     while not stalled:
