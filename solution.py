@@ -10,9 +10,9 @@ boxes = cross(rows, cols) ## This line is to create all possible boxes
 row_units = [cross(r,cols) for r in rows] # This creates a list of the boxes in a row
 column_units = [cross(rows,c) for c in cols] ## This creates a list of boxes in a column
 square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')] # this creates a list of the boxes in a 3x3 square
-diagnol_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['I1','H2','G3','F4','E5','D4','C3','B2','A1']] ### Adding diagnol units in the list
+diagnol_units = [['A1','B2','C3','D4','E5','F6','G7','H8','I9'],['I1','H2','G3','F4','E5','D6','C7','B8','A9']] ### Adding diagnol units in the list
 ### Addding diagnol units will help because this is the list which decides what units get processed together for numbers 1-9.
-unitlist = row_units + square_units + column_units + diagnol_units ### Union of all the lists
+unitlist = diagnol_units + row_units + square_units + column_units ### Union of all the lists
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes) ### Units is a dictionary with key as box and value as the list of list of 9 boxes which follow the law of 1-9 numbers
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes) ### Peers contains a dictionary of boxes which are part of the same units
 
@@ -37,8 +37,7 @@ def naked_twins(values):
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
     
-    for i in values.keys():   ### For each box in the soduku
-        for unit in units[i]: ### Find the unit of the box i
+    for unit in unitlist: ### Find the unit of the box i
             dict_naked_twins=dict() ### create a naked twins dictionary
             for box in unit:  ### for each box within the unit
                 if len(values[box])==2:  ## identify the boxes which have only two values
@@ -110,7 +109,18 @@ def only_choice(values):
             if len(dplaces) == 1:
                 values[dplaces[0]] = digit
     return values
+def sanity_check(values):
+    for single_unit in unitlist:
+        single_output_box_in_unit=set()
+        count = 0
+        for box in single_unit:
+            if len(values[box])==1:
+                single_output_box_in_unit.update(values[box])
+                count=count+1
+        if len(single_output_box_in_unit)!= count:
+            return False
 
+    return True
 def reduce_puzzle(values):
     """ This function executes the constraint propogation algorithm by trying to optimize the sudoku by repeatedly executing
     the elimination, naked_twins and only_choice till there is no optimization left
@@ -120,12 +130,12 @@ def reduce_puzzle(values):
     while not stalled:
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
-        # Use the Eliminate Strategy
-        values = eliminate(values)
+        # Naked Twins strategy
+        values = naked_twins(values)
         # Use the Only Choice Strategy
         values = only_choice(values)
-        #Naked Twins strategy
-        values = naked_twins(values)
+        # Use the Eliminate Strategy
+        values = eliminate(values)
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         # If no new values were added, stop the loop.
@@ -133,6 +143,7 @@ def reduce_puzzle(values):
         # Sanity check, return False if there is a box with zero available values:
         if len([box for box in values.keys() if len(values[box]) == 0]):
             return False
+        
     return values
 
 def solve(grid):
